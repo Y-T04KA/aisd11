@@ -2,7 +2,82 @@
 
 using namespace std;
 
-#define MAX 1000
+template<class T>
+class Stack {
+private:
+    T* m_array;
+    int m_count;
+    int m_max_size;
+    static const int m_growth_factor = 2;
+    static const int m_initial_max_size = 10;
+public:
+    Stack();
+    inline Stack(const Stack<T>& rhs) { *this = rhs; }
+    void operator=(const Stack<T>& rhs);
+    Stack(int initial_max_size);
+    ~Stack();
+    void push(T data);
+    void pop();
+    void clear();
+    inline bool empty() { return m_count == 0; }
+    inline T& top() { return m_array[m_count - 1]; }
+    inline int size() { return m_count; }
+private:
+    void init();
+    void increase_array_size();
+};
+template <class T>
+Stack<T>::Stack() :m_count(0), m_max_size(m_initial_max_size) {
+    init();
+}
+template<class T>
+Stack<T>::Stack(int initial_max_size) : m_count(0), m_max_size(initial_max_size) {
+    init();
+}
+template<class T>
+Stack<T>::~Stack() {
+    delete[] m_array;
+}
+template<class T>
+void Stack<T>::init() {
+    m_array = new T[m_max_size];
+    m_count = 0;
+}
+template<class T>
+void Stack<T>::increase_array_size() {
+    m_max_size = m_growth_factor * m_max_size;
+    T* tmp = new T[m_max_size];
+    for (int i = 0; i < m_count; i++) tmp[i] = m_array[i];
+    delete[] m_array;
+    m_array = tmp;
+}
+template<class T>
+void Stack<T>::push(T data) {
+    if (m_count == m_max_size) increase_array_size();
+    m_array[m_count++] = data;
+}
+template<class T>
+void Stack<T>::pop() {
+    if (m_count == 0) cout << "stack underflow\n";
+    m_count--;
+}
+template<class T>
+void Stack<T>::clear() {
+    delete[] m_array;
+    m_max_size = m_initial_max_size;
+    init();
+}
+template<class T>
+void Stack<T>::operator=(const Stack<T>& rhs) {
+    if (this != &rhs) {
+        delete[] m_array;
+        init();
+        for (int i = 0; i < rhs.m_count; i++) {
+            this->push(rhs.m_array[i]);
+        }
+    }
+}
+/*#define MAX 1000
 
 class Stack {//stack via array
     int top;
@@ -51,9 +126,9 @@ int Stack::peek() {
 
 bool Stack::isEmpty() {
     return (top < 0);
-}
+}*/
 ///////////
-class Dyn {
+/*class Dyn {
 private:
     int* pa; // points to the array
     int length; 
@@ -107,7 +182,7 @@ void Dyn::add(int val) {
 }
 int Dyn::size() {
     return length;
-}
+}*/
 ////////////////
 template <typename T>
 class List {
@@ -237,7 +312,7 @@ void List<T>::del_last() {
     del_node(Count - 1);
 }
 
-int prec(char c) {
+int priority(char c) {
     if (c == '^') return 3;
     else if (c == '/' || c == '*') return 2;
     else if (c == '+' || c == '-') return 1;
@@ -247,10 +322,10 @@ int prec(char c) {
 int main() {
     int selector(5);
     List<char> lst;
-    class Stack s;
-    Dyn d;
+    Stack<char> s;
+    //Dyn d;
     while (selector != 0) {
-        cout << "\n1 to fill the list, 2 to show the list, 3 to convert, 4 to add node, 5 to delete node, 6 to array, 0 to exit\n";
+        cout << "\n1 to fill the list, 2 to show the list, 3 to conver, 4 to add node, 5 to delete node, 6 to array, 0 to exit\n";
         cin >> selector;
         switch (selector) {
         case 1: {
@@ -281,24 +356,24 @@ int main() {
                 if (c >= '0' && c <= '9') cout << c << ' ';
                 else if (c == '(') s.push('(');
                 else if (c == ')') {
-                    while (s.peek() != '(') {
-                        result = s.peek();
+                    while (s.top() != '(') {
+                        result = s.top();
                         cout << result << ' ';
                         s.pop();
                     }
                     s.pop();
                 }
                 else {
-                    while (!s.isEmpty() && prec(lst[i]) <= prec(s.peek())) {
-                        result = s.peek();
+                    while (!s.empty() && priority(lst[i]) <= priority(s.top())) {
+                        result = s.top();
                         cout << result << ' ';
                         s.pop();
                     }
                     s.push(c);
                 }
             }
-            while (!s.isEmpty()) {
-                result = s.peek();
+            while (!s.empty()) {
+                result = s.top();
                 cout << result << ' ';
                 s.pop();
             }
@@ -329,7 +404,7 @@ int main() {
             lst.del_node(pos);
             break; }
         case 6: {
-            int token(0);
+           /* int token(0);
             cout << "enter next elem, enter -1 to end\n";
             while (token != -1) {
                 cin >> token;
@@ -339,7 +414,7 @@ int main() {
                 };
             }
                 for (int i = 0; i < d.size(); i++) 
-                    cout << d[i] << endl;
+                    cout << d[i] << endl;*/
                 break;
             }
         }
