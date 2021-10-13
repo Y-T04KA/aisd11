@@ -60,7 +60,7 @@ void Stack<T>::push(T data) {
 }
 template<class T>
 void Stack<T>::pop() {
-    if (count == 0) cout << "stack underflow\n";
+    if (count == 0) std::cout << "stack underflow\n";
     count--;
 }
 template<class T>
@@ -71,7 +71,7 @@ void Stack<T>::clear() {
 }
 template<class T>
 void Stack<T>::clearElem(int pos) {
-    if (pos >= maxsize) cout << "no such element\n";
+    if (pos >= maxsize) std::cout << "no such element\n";
     else m_array[pos] = 0;
 }
 template<class T>
@@ -81,7 +81,7 @@ void Stack<T>::add(T data, int pos) {
 }
 template<class T>
 char Stack<T>::get(int pos) {
-    if (pos >= maxsize) cout << "no such element\n";
+    if (pos >= maxsize) std::cout << "no such element\n";
     else {
         char temp;
         temp = m_array[pos];
@@ -227,19 +227,20 @@ int priority(char c) {
 
 int main() {
     int selector(5);
-    List<char> lst;
+    List<char> lst, lst2;
     Stack<char> s;
+    Stack<int> s_int;
     while (selector != 0) {
-        cout << "\n1 to fill the list, 2 to show the list, 3 to SortStation, 4 to add node, 5 to delete node, 6 to del/add in array\n0 to exit\n";
+        std::cout << "\n1 to fill the list, 2 to show the list, 3 to SortStation, 4 to add node, 5 to delete node, 6 to del/add in array\n0 to exit\n";
         cin >> selector;
         switch (selector) {
         case 1: {
             char token;
-            cout << "What the first element will be?\nenter e to end\n";
+            std::cout << "What the first element will be?\nenter e to end\n";
             cin >> token;
             lst.add_head(token);
             while (token != 'e') {
-                //cout << "enter next elem, enter e to end\n";
+                //std::cout << "enter next elem, enter e to end\n";
                 cin >> token;
                 if (token == 'e') { break; }
                 else {
@@ -247,23 +248,27 @@ int main() {
                 };
             }break; }
         case 2: {
-            cout << "Nodes: " << lst.GetCount() << endl;
+            std::cout << "Nodes: " << lst.GetCount() << endl;
             for (int i = 0; i < lst.GetCount(); i++)
             {
-                cout << lst[i] << " ";
+                std::cout << lst[i] << " ";
             }
-            cout << endl;
+            std::cout << endl;
             break; }
         case 3: {
             char result;
             for (int i = 0; i < lst.GetCount(); i++) {
                 char c = lst[i];
-                if (c >= '0' && c <= '9') cout << c << ' ';
+                if (c >= '0' && c <= '9') {
+                    std::cout << c << ' ';
+                    lst2.add_last(c);
+                }
                 else if (c == '(') s.push('(');
                 else if (c == ')') {
                     while (s.top() != '(') {
                         result = s.top();
-                        cout << result << ' ';
+                        std::cout << result << ' ';
+                        lst2.add_last(result);
                         s.pop();
                     }
                     s.pop();
@@ -271,7 +276,8 @@ int main() {
                 else {
                     while (!s.empty() && priority(lst[i]) <= priority(s.top())) {
                         result = s.top();
-                        cout << result << ' ';
+                        std::cout << result << ' ';
+                        lst2.add_last(result);
                         s.pop();
                     }
                     s.push(c);
@@ -279,18 +285,48 @@ int main() {
             }
             while (!s.empty()) {
                 result = s.top();
-                cout << result << ' ';
+                std::cout << result << ' ';
+                lst2.add_last(result);
                 s.pop();
             }
+            s.clear();
+            int len = lst2.GetCount();
+            for (int i = 0; i < len; ++i) {
+                if (lst2[i] >= '0' && lst2[i] <= '9') { s_int.push(lst2[i] - '0'); }
+                else {
+                    int a = s_int.top();
+                    s_int.pop();
+                    int b = s_int.top();
+                    s_int.pop();
+                    switch (lst2[i]) {
+                    case '+':
+                        s_int.push(b + a);
+                        break;
+                    case '-':
+                        s_int.push(b - a);
+                        break;
+                    case '*':
+                        s_int.push(b * a);
+                        break;
+                    case '/':
+                        s_int.push(b / a);
+                        break;
+                    case '^':
+                        s_int.push(pow(b, a));
+                        break;
+                    }
+                }
+            }
+            std::cout << "\nanswer: " << s_int.top();
             break; }
         case 4: { //add node
             int pos(-1);
             char temp;
             while (pos == -1) {
-                cout << "enter number of the node and symbol\n";
+                std::cout << "enter number of the node and symbol\n";
                 cin >> pos >> temp;
                 if (pos > lst.GetCount() + 1) {
-                    cout << "too big number, try again\n";
+                    std::cout << "too big number, try again\n";
                     pos = -1;
                 }
             }
@@ -299,10 +335,10 @@ int main() {
         case 5: { //delete node
             int pos(-1);
             while (pos == -1) {
-                cout << "number of the node you want to delete - ";
+                std::cout << "number of the node you want to delete - ";
                 cin >> pos;
                 if (pos > lst.GetCount()) {
-                    cout << "too big number, try again\n";
+                    std::cout << "too big number, try again\n";
                     pos = -1;
                 }
             }
@@ -311,12 +347,12 @@ int main() {
         case 6: {
             int sel(0), number;
             char sym;
-            cout << "1 to add, 2 to delete, 3 to show\n";
+            std::cout << "1 to add, 2 to delete, 3 to show\n";
             cin >> sel;
             if (sel == 1) {
-                cout << "enter position you want to add: ";
+                std::cout << "enter position you want to add: ";
                 cin >> number;
-                cout << "enter element you want to add: ";
+                std::cout << "enter element you want to add: ";
                 cin >> sym;
                 if (!s.empty()) {
                     for (int i = 0; i < number + 10; ++i) {//fill array with space symbols
@@ -326,14 +362,14 @@ int main() {
                 s.add(sym, number);
             }
             else if (sel == 2) {
-                cout << "enter position you want to delete: ";
+                std::cout << "enter position you want to delete: ";
                 cin >> number;
                 s.clearElem(number);
             }
             else {
-                cout << "how many elems you want to see: ";
+                std::cout << "how many elems you want to see: ";
                 cin >> number;
-                for (int i = 0; i < number; ++i) cout << s.get(i) << endl;
+                for (int i = 0; i < number; ++i) std::cout << s.get(i) << endl;
             }
             break;
         }
