@@ -13,7 +13,6 @@ private:
 public:
     Stack();
     inline Stack(const Stack<T>& rhs) { *this = rhs; }
-    void operator=(const Stack<T>& rhs);
     Stack(int initial_max_size);
     ~Stack();
     void push(T data);
@@ -87,16 +86,6 @@ char Stack<T>::get(int pos) {
         char temp;
         temp = m_array[pos];
         return temp;
-    }
-}
-template<class T>
-void Stack<T>::operator=(const Stack<T>& rhs) {
-    if (this != &rhs) {
-        delete[] m_array;
-        init();
-        for (int i = 0; i < rhs.count; i++) {
-            this->push(rhs.m_array[i]);
-        }
     }
 }
 
@@ -322,16 +311,17 @@ int main() {
         case 6: {
             int sel(0), number;
             char sym;
-            cout << "1 to add, 2 to delete, 3 to show\nnot recomended in one run with SortStation\n";
+            cout << "1 to add, 2 to delete, 3 to show\n";
             cin >> sel;
-
             if (sel == 1) {
                 cout << "enter position you want to add: ";
                 cin >> number;
                 cout << "enter element you want to add: ";
                 cin >> sym;
-                for (int i = 0; i < number + 10; ++i) {//fill array with space symbols
-                    s.add(' ', i);
+                if (!s.empty()) {
+                    for (int i = 0; i < number + 10; ++i) {//fill array with space symbols
+                        s.add(' ', i);
+                    }
                 }
                 s.add(sym, number);
             }
