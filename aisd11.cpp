@@ -6,10 +6,10 @@ template<class T>
 class Stack {
 private:
     T* m_array;
-    int m_count;
-    int m_max_size;
-    static const int m_growth_factor = 2;
-    static const int m_initial_max_size = 10;
+    int count;
+    int maxsize;
+    static const int resize = 2;
+    static const int init_maxsize = 10;
 public:
     Stack();
     inline Stack(const Stack<T>& rhs) { *this = rhs; }
@@ -19,19 +19,22 @@ public:
     void push(T data);
     void pop();
     void clear();
-    inline bool empty() { return m_count == 0; }
-    inline T& top() { return m_array[m_count - 1]; }
-    inline int size() { return m_count; }
+    void clearElem(int pos);
+    void add(T data, int pos);
+    char get(int pos);
+    inline bool empty() { return count == 0; }
+    inline T& top() { return m_array[count - 1]; }
+    inline int size() { return count; }
 private:
     void init();
     void increase_array_size();
 };
 template <class T>
-Stack<T>::Stack() :m_count(0), m_max_size(m_initial_max_size) {
+Stack<T>::Stack() :count(0), maxsize(init_maxsize) {
     init();
 }
 template<class T>
-Stack<T>::Stack(int initial_max_size) : m_count(0), m_max_size(initial_max_size) {
+Stack<T>::Stack(int initial_max_size) : count(0), maxsize(initial_max_size) {
     init();
 }
 template<class T>
@@ -40,149 +43,63 @@ Stack<T>::~Stack() {
 }
 template<class T>
 void Stack<T>::init() {
-    m_array = new T[m_max_size];
-    m_count = 0;
+    m_array = new T[maxsize];
+    count = 0;
 }
 template<class T>
 void Stack<T>::increase_array_size() {
-    m_max_size = m_growth_factor * m_max_size;
-    T* tmp = new T[m_max_size];
-    for (int i = 0; i < m_count; i++) tmp[i] = m_array[i];
+    maxsize = resize * maxsize;
+    T* tmp = new T[maxsize];
+    for (int i = 0; i < count; i++) tmp[i] = m_array[i];
     delete[] m_array;
     m_array = tmp;
 }
 template<class T>
 void Stack<T>::push(T data) {
-    if (m_count == m_max_size) increase_array_size();
-    m_array[m_count++] = data;
+    if (count == maxsize) increase_array_size();
+    m_array[count++] = data;
 }
 template<class T>
 void Stack<T>::pop() {
-    if (m_count == 0) cout << "stack underflow\n";
-    m_count--;
+    if (count == 0) cout << "stack underflow\n";
+    count--;
 }
 template<class T>
 void Stack<T>::clear() {
     delete[] m_array;
-    m_max_size = m_initial_max_size;
+    maxsize = init_maxsize;
     init();
+}
+template<class T>
+void Stack<T>::clearElem(int pos) {
+    if (pos >= maxsize) cout << "no such element\n";
+    else m_array[pos] = 0;
+}
+template<class T>
+void Stack<T>::add(T data, int pos) {
+    while (count >= maxsize) increase_array_size();
+    m_array[pos] = data;
+}
+template<class T>
+char Stack<T>::get(int pos) {
+    if (pos >= maxsize) cout << "no such element\n";
+    else {
+        char temp;
+        temp = m_array[pos];
+        return temp;
+    }
 }
 template<class T>
 void Stack<T>::operator=(const Stack<T>& rhs) {
     if (this != &rhs) {
         delete[] m_array;
         init();
-        for (int i = 0; i < rhs.m_count; i++) {
+        for (int i = 0; i < rhs.count; i++) {
             this->push(rhs.m_array[i]);
         }
     }
 }
-/*#define MAX 1000
 
-class Stack {//stack via array
-    int top;
-public:
-    int a[MAX]; //max size of stack
-    Stack() { top = -1; }
-    bool push(int x);//add to stack
-    int pop();//get from stack
-    int peek();//show top of stack
-    bool isEmpty();
-    char Top();
-};
-
-bool Stack::push(int x) {
-    if (top >= (MAX - 1)) {
-        cout << "Stack overflow";
-        return false;
-    }
-    else {
-        a[++top] = x;
-        return true;
-    }
-}
-
-int Stack::pop(){
-    if (top < 0) {
-        cout << "Stack Underflow";
-        return 0;
-    }
-    else {
-        int x = a[top--];
-        return x;
-    }
-}
-
-int Stack::peek() {
-    if (top < 0) {
-        cout << "stack is empty";
-        return 0;
-    }
-    else {
-        int x = a[top];
-        return x;
-    }
-}
-
-bool Stack::isEmpty() {
-    return (top < 0);
-}*/
-///////////
-/*class Dyn {
-private:
-    int* pa; // points to the array
-    int length; 
-    int nextIndex; 
-public:
-    Dyn(); 
-    ~Dyn(); 
-    int& operator[](int index); 
-    void add(int val); 
-    int size(); 
-};
-Dyn::Dyn() {
-    pa = new int[3];
-    for (int i = 0; i < 3; i++)
-        pa[i] = 0;
-    length = 3;
-    nextIndex = 0;
-}
-Dyn::~Dyn() {
-    delete[] pa;
-}
-int& Dyn::operator[](int index) {
-    int* pnewa; 
-    if (index >= length) { 
-        pnewa = new int[index + 5]; 
-        for (int i = 0; i < nextIndex; i++) 
-            pnewa[i] = pa[i];
-        for (int j = nextIndex; j < index + 5; j++) 
-            pnewa[j] = 0;
-        length = index + 5; 
-        delete[] pa; 
-        pa = pnewa; 
-    }
-    if (index > nextIndex) 
-        nextIndex = index + 1;
-    return *(pa + index); 
-}
-void Dyn::add(int val) {
-    int* pnewa;
-    if (nextIndex == length) {
-        length = length + 5;
-        pnewa = new int[length];
-        for (int i = 0; i < nextIndex; i++)
-            pnewa[i] = pa[i];
-        for (int j = nextIndex; j < length; j++)
-            pnewa[j] = 0;
-        delete[] pa;
-        pa = pnewa;
-    }
-    pa[nextIndex++] = val;
-}
-int Dyn::size() {
-    return length;
-}*/
 ////////////////
 template <typename T>
 class List {
@@ -257,11 +174,11 @@ void List<T>::clear() {
 
 template<typename T>
 T& List<T>::operator[](const int index) {
-    int c = 0; 
+    int c = 0;
     Node<T>* current = this->head;
     while (current != nullptr) {
         if (c == index) {
-            return current->data; 
+            return current->data;
         }
         current = current->nextnode;
         c++;
@@ -323,9 +240,8 @@ int main() {
     int selector(5);
     List<char> lst;
     Stack<char> s;
-    //Dyn d;
     while (selector != 0) {
-        cout << "\n1 to fill the list, 2 to show the list, 3 to conver, 4 to add node, 5 to delete node, 6 to array, 0 to exit\n";
+        cout << "\n1 to fill the list, 2 to show the list, 3 to SortStation, 4 to add node, 5 to delete node, 6 to del/add in array\n0 to exit\n";
         cin >> selector;
         switch (selector) {
         case 1: {
@@ -404,21 +320,35 @@ int main() {
             lst.del_node(pos);
             break; }
         case 6: {
-           /* int token(0);
-            cout << "enter next elem, enter -1 to end\n";
-            while (token != -1) {
-                cin >> token;
-                if (token == -1) { break; }
-                else {
-                    d.add(token);
-                };
+            int sel(0), number;
+            char sym;
+            cout << "1 to add, 2 to delete, 3 to show\nnot recomended in one run with SortStation\n";
+            cin >> sel;
+
+            if (sel == 1) {
+                cout << "enter position you want to add: ";
+                cin >> number;
+                cout << "enter element you want to add: ";
+                cin >> sym;
+                for (int i = 0; i < number + 10; ++i) {//fill array with space symbols
+                    s.add(' ', i);
+                }
+                s.add(sym, number);
             }
-                for (int i = 0; i < d.size(); i++) 
-                    cout << d[i] << endl;*/
-                break;
+            else if (sel == 2) {
+                cout << "enter position you want to delete: ";
+                cin >> number;
+                s.clearElem(number);
             }
+            else {
+                cout << "how many elems you want to see: ";
+                cin >> number;
+                for (int i = 0; i < number; ++i) cout << s.get(i) << endl;
+            }
+            break;
+        }
         }
 
-        }
-        return 0;
     }
+    return 0;
+}
